@@ -34,15 +34,18 @@ src/
 #### Using Docker
 
 ```bash
-docker pull ghcr.io/username/azure-devops-mcp:latest
+# Clone the repository and build the Docker image locally
+git clone https://github.com/aaronsb/ado-mcp.git
+cd ado-mcp
+./scripts/build-local.sh
 ```
 
 #### Local Development
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/username/azure-devops-mcp.git
-cd azure-devops-mcp
+git clone https://github.com/aaronsb/ado-mcp.git
+cd ado-mcp
 ```
 
 2. Install dependencies:

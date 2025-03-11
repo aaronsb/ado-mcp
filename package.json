@@ -1,11 +1,11 @@
 {
-  "name": "azure-devops-mcp",
+  "name": "ado-mcp",
   "version": "0.1.0",
   "description": "A Model Context Protocol server for Azure DevOps",
   "private": true,
   "type": "module",
   "bin": {
-    "azure-devops-mcp": "./build/index.js"
+    "ado-mcp": "./build/index.js"
   },
   "files": [
     "build"

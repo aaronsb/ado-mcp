@@ -1,6 +1,6 @@
 # AI Assistant Installation Guide for Azure DevOps MCP
 
-This guide provides detailed instructions for AI assistants like Cline to help users set up and configure the Azure DevOps MCP server. The instructions are formatted to be easily parsed by AI assistants for a smooth one-click installation experience.
+This guide provides detailed instructions for AI assistants like Cline to help users set up and configure the Azure DevOps MCP server. The instructions are formatted to be easily parsed by AI assistants for a smooth installation experience.
 
 ## Prerequisites
 
@@ -13,13 +13,19 @@ This guide provides detailed instructions for AI assistants like Cline to help u
    - Project name (optional)
    - Personal Access Token (PAT) with appropriate permissions
 
-## One-Click Installation Steps
+## Installation Steps
 
-### 1. Pull the Docker Image
+### 1. Build the Docker Image
+
+Clone the repository and build the Docker image locally:
 
 ```bash
-docker pull ghcr.io/username/azure-devops-mcp:latest
+git clone https://github.com/aaronsb/ado-mcp.git
+cd ado-mcp
+./scripts/build-local.sh
 ```
+
+This will create a Docker image tagged as `ado-mcp:local`.
 
 ### 2. Configure Your AI Assistant
 
@@ -32,7 +38,7 @@ Edit: `~/.config/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_m
 ```json
 {
   "mcpServers": {
-    "azuredevops": {
+    "ado-mcp": {
       "command": "docker",
       "args": [
         "run",
@@ -41,18 +47,15 @@ Edit: `~/.config/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_m
         "-e",
         "ADO_ORGANIZATION",
         "-e",
-        "ADO_PROJECT",
-        "-e",
         "ADO_PAT",
-        "ghcr.io/username/azure-devops-mcp:latest"
+        "ado-mcp:local"
       ],
       "env": {
         "ADO_ORGANIZATION": "your-organization",
-        "ADO_PROJECT": "your-project",
         "ADO_PAT": "your-personal-access-token"
       },
-      "autoApprove": [],
-      "disabled": false
+      "disabled": false,
+      "autoApprove": []
     }
   }
 }
@@ -65,7 +68,7 @@ Edit: `~/.config/Claude/claude_desktop_config.json` (Linux/Mac) or `%APPDATA%\Cl
 ```json
 {
   "mcpServers": {
-    "azuredevops": {
+    "ado-mcp": {
       "command": "docker",
       "args": [
         "run",
@@ -74,51 +77,15 @@ Edit: `~/.config/Claude/claude_desktop_config.json` (Linux/Mac) or `%APPDATA%\Cl
         "-e",
         "ADO_ORGANIZATION",
         "-e",
-        "ADO_PROJECT",
-        "-e",
         "ADO_PAT",
-        "ghcr.io/username/azure-devops-mcp:latest"
+        "ado-mcp:local"
       ],
       "env": {
         "ADO_ORGANIZATION": "your-organization",
-        "ADO_PROJECT": "your-project",
         "ADO_PAT": "your-personal-access-token"
       },
-      "autoApprove": [],
-      "disabled": false
-    }
-  }
-}
-```
-
-#### For Goose
-
-Edit: `~/.config/goose/config.json` (Linux/Mac) or `%APPDATA%\goose\config.json` (Windows)
-
-```json
-{
-  "mcpServers": {
-    "azuredevops": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e",
-        "ADO_ORGANIZATION",
-        "-e",
-        "ADO_PROJECT",
-        "-e",
-        "ADO_PAT",
-        "ghcr.io/username/azure-devops-mcp:latest"
-      ],
-      "env": {
-        "ADO_ORGANIZATION": "your-organization",
-        "ADO_PROJECT": "your-project",
-        "ADO_PAT": "your-personal-access-token"
-      },
-      "autoApprove": [],
-      "disabled": false
+      "disabled": false,
+      "autoApprove": []
     }
   }
 }
@@ -176,8 +143,8 @@ If you prefer to run the MCP server locally without Docker:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/username/azure-devops-mcp.git
-cd azure-devops-mcp
+git clone https://github.com/aaronsb/ado-mcp.git
+cd ado-mcp
 ```
 
 2. Install dependencies:
@@ -211,10 +178,10 @@ npm run build
 ```json
 {
   "mcpServers": {
-    "azuredevops": {
+    "ado-mcp": {
       "command": "node",
       "args": [
-        "/path/to/azure-devops-mcp/build/index.js"
+        "/path/to/ado-mcp/build/index.js"
       ],
       "autoApprove": [],
       "disabled": false
@@ -240,7 +207,7 @@ npm run build
    - Solution: Generate a new PAT with the correct permissions
 
 3. **Docker Image Not Found**
-   - Run `docker pull ghcr.io/username/azure-devops-mcp:latest` to manually pull the image
+   - Make sure you've built the image with `./scripts/build-local.sh`
    - Check your internet connection
    - Solution: Verify Docker is running with `docker --version`
 
@@ -254,7 +221,7 @@ If you encounter issues:
 
 1. Check the Docker logs:
    ```bash
-   docker logs $(docker ps | grep azure-devops-mcp | awk '{print $1}')
+   docker logs $(docker ps | grep ado-mcp | awk '{print $1}')
    ```
 
 2. File an issue on GitHub with:
