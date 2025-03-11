@@ -1,0 +1,57 @@
+# Azure DevOps MCP Project Rules
+
+## Project Structure
+- Follow TypeScript best practices with proper module organization
+- Maintain clear separation between entities, API client, and tools
+- Use consistent naming conventions throughout the codebase
+- Keep the directory structure clean and logical
+
+## Development Guidelines
+- Use the latest version of the MCP SDK (currently 0.6.0)
+- Implement proper error handling and logging
+- Use TypeScript types/interfaces for all API responses
+- Document all public functions, classes, and interfaces
+- Follow SOLID principles in code organization
+
+## Build Process
+- Maintain both local development and GitHub Actions workflows
+- Docker container should be built and published to GHCR
+- Local build script should mirror CI process for consistency
+- Use multi-stage Docker builds for smaller image size
+
+## Authentication
+- Use Personal Access Token (PAT) for Azure DevOps authentication
+- Support both environment variables and config file for credentials
+- Never hardcode credentials in the codebase
+- Provide clear documentation on token scopes needed
+
+## API Integration
+- Reference the official Azure DevOps REST API documentation
+- Implement proper pagination handling for all list operations
+- Use proper retry logic for API requests
+- Cache API responses where appropriate to reduce API calls
+
+## Testing
+- Add placeholders for tests in the build process
+- Plan for integration tests in the future
+- Use mock responses for unit testing
+
+## Documentation
+- Maintain comprehensive documentation for all features
+- Include installation guide for AI assistants
+- Document all available tools and their parameters
+- Provide examples for common operations
+
+## Resources to Implement
+- Projects
+- Work Items
+- Repositories
+- Pull Requests
+- Branches
+- Pipelines
+
+## Remember
+- Focus on basic CRUD operations first
+- Prioritize working functionality over completeness
+- Document as you go
+- Keep

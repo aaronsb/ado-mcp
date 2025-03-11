@@ -1,0 +1,16 @@
+{
+  "organization": "your-organization",
+  "project": "your-project",
+  "credentials": {
+    "pat": "your-personal-access-token"
+  },
+  "api": {
+    "baseUrl": "https://dev.azure.com",
+    "version": "7.0",
+    "retry": {
+      "maxRetries": 3,
+      "delayMs": 1000,
+      "backoffFactor": 2
+    }
+  }
+}
