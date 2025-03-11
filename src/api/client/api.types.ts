@@ -54,6 +54,14 @@ export interface PaginatedApiResponse<T> {
 }
 
 /**
+ * Common API response structure
+ */
+export interface ApiResponse<T> {
+  count?: number;
+  value: T[];
+}
+
+/**
  * API error response
  */
 export interface ApiErrorResponse {

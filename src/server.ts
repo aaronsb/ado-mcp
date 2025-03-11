@@ -8,31 +8,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import fs from 'fs';
 import path from 'path';
-
-// This will be implemented later
-interface ADOServiceConfig {
-  organization: string;
-  project?: string;
-  credentials: {
-    pat: string;
-  };
-  api?: {
-    baseUrl?: string;
-    version?: string;
-    retry?: {
-      maxRetries?: number;
-      delayMs?: number;
-      backoffFactor?: number;
-    };
-  };
-}
-
-// This will be implemented later
-class ADOService {
-  constructor(config: ADOServiceConfig) {
-    // Implementation will be added later
-  }
-}
+import { ADOService, ADOServiceConfig } from './api/service.js';
 
 function loadConfig(): ADOServiceConfig {
   // Try environment variables first
@@ -537,17 +513,21 @@ export class AzureDevOpsServer {
 
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       try {
-        // This is a placeholder for the actual tool implementations
-        // In a real implementation, we would call the appropriate tool based on the request.params.name
+        const toolName = request.params.name;
+        const tool = this.service.getTool(toolName);
         
-        return {
-          content: [
-            {
-              type: 'text',
-              text: `Azure DevOps API tool '${request.params.name}' is not yet implemented. This is a placeholder for the actual implementation.`,
-            },
-          ],
-        };
+        if (!tool) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `Azure DevOps API tool '${toolName}' is not yet implemented.`,
+              },
+            ],
+          };
+        }
+        
+        return await tool.execute(request.params.arguments);
       } catch (error) {
         if (error instanceof McpError) {
           throw error;

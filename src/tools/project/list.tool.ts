@@ -2,7 +2,6 @@ import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
 import { ADOApiClient } from '../../api/client/api.client.js';
 import { Project, ProjectData } from '../../entities/project/project.entity.js';
-import { ApiResponse } from '../../api/client/api.types.js';
 
 /**
  * Input schema for list_projects tool
@@ -51,11 +50,14 @@ export class ListProjectsTool {
       // Validate arguments
       const params = ListProjectsSchema.parse(args);
 
-      // Call API
-      const response = await this.apiClient.request<ApiResponse<ProjectData>>('projects');
+      // Get Core API client
+      const coreApi = await this.apiClient.getCoreApi();
+      
+      // Call API to get projects
+      const projects = await coreApi.getProjects();
       
       // Transform response
-      const projects = response.value.map(project => new Project(project));
+      const projectEntities = projects.map(project => new Project(project as unknown as ProjectData));
       
       // Format result
       return {
@@ -64,8 +66,8 @@ export class ListProjectsTool {
             type: 'text',
             text: JSON.stringify(
               {
-                count: projects.length,
-                projects: projects.map(project => ({
+                count: projectEntities.length,
+                projects: projectEntities.map(project => ({
                   id: project.id,
                   name: project.name,
                   description: project.description,
