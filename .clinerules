@@ -5,13 +5,25 @@
 - Maintain clear separation between entities, API client, and tools
 - Use consistent naming conventions throughout the codebase
 - Keep the directory structure clean and logical
+- Apply the "Rule of Three" for code organization - refactor shared code when it appears in three or more places
+- Implement layered architecture with clear boundaries between:
+  - Configuration management
+  - Server initialization and lifecycle
+  - API client and service layer
+  - Tool definitions and implementations
+  - Request handlers
 
 ## Development Guidelines
 - Use the latest version of the MCP SDK (currently 0.6.0)
 - Implement proper error handling and logging
 - Use TypeScript types/interfaces for all API responses
 - Document all public functions, classes, and interfaces
-- Follow SOLID principles in code organization
+- Follow SOLID principles in code organization:
+  - Single Responsibility Principle: Each module should have one reason to change
+  - Open/Closed Principle: Open for extension, closed for modification
+  - Liskov Substitution Principle: Subtypes must be substitutable for their base types
+  - Interface Segregation Principle: Many client-specific interfaces are better than one general-purpose interface
+  - Dependency Inversion Principle: Depend on abstractions, not concretions
 
 ## Build Process
 - Maintain both local development and GitHub Actions workflows
@@ -50,8 +62,18 @@
 - Branches
 - Pipelines
 
+## Code Organization
+- Keep files focused on a single responsibility
+- Limit file size to maintain readability (aim for <300 lines per file)
+- Group related functionality in directories with clear naming
+- Use index files to simplify imports
+- Implement consistent patterns across similar components
+- Separate tool definitions from their implementations
+- Extract reusable logic into shared utilities
+
 ## Remember
 - Focus on basic CRUD operations first
 - Prioritize working functionality over completeness
 - Document as you go
-- Keep
+- Keep code modular and maintainable
+- Refactor when complexity increases

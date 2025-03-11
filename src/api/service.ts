@@ -1,6 +1,5 @@
-import { ADOApiClient } from './client/api.client.js';
-import { ADOApiConfig } from './client/api.types.js';
-import { ListProjectsTool } from '../tools/project/list.tool.js';
+import { ADOApiClient, ADOApiConfig } from './client/index.js';
+import { ListProjectsTool } from '../tools/project/index.js';
 
 /**
  * Service configuration

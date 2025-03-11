@@ -1,7 +1,7 @@
 import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
-import { ADOApiClient } from '../../api/client/api.client.js';
-import { Project, ProjectData } from '../../entities/project/project.entity.js';
+import { ADOApiClient } from '../../api/client/index.js';
+import { Project, ProjectData } from '../../entities/project/index.js';
 
 /**
  * Input schema for list_projects tool

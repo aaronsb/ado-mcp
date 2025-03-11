@@ -1,5 +1,4 @@
-import { ADOBaseEntity } from '../base/base.entity.js';
-import { EntityReference } from '../base/base.types.js';
+import { ADOBaseEntity, EntityReference } from '../base/index.js';
 
 /**
  * Project visibility
