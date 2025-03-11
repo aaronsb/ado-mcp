@@ -38,7 +38,7 @@ export class AzureDevOpsServer {
         name: 'azure-devops-server',
         version: '0.1.0',
       },
-      getServerCapabilities()
+      getServerCapabilities(this.service.getApiClient())
     );
     
     // Initialize request handlers

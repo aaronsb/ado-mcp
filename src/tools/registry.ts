@@ -1,6 +1,6 @@
 import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
 import { ADOApiClient } from '../api/client/index.js';
-import { ListProjectsTool } from './project/index.js';
+import { ToolGenerator } from './generator.js';
 
 /**
  * Tool definition interface
@@ -48,15 +48,15 @@ export class ToolRegistry {
    * Initialize all tools
    */
   private initializeTools(): void {
-    // Project tools
-    this.registerTool(ListProjectsTool);
+    // Auto-generate tools using the tool generator
+    const generatedTools = ToolGenerator.generateAllTools();
     
-    // TODO: Register other tools as they are implemented
-    // Work item tools
-    // Repository tools
-    // Pull request tools
-    // Branch tools
-    // Pipeline tools
+    // Register all generated tools
+    for (const toolClass of generatedTools) {
+      this.registerTool(toolClass);
+    }
+    
+    console.debug(`Initialized ${generatedTools.length} tools`);
   }
 
   /**
