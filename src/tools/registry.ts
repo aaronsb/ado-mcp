@@ -1,6 +1,6 @@
 import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
 import { ADOApiClient } from '../api/client/index.js';
-import { ToolGenerator } from './generator.js';
+import { EntityToolFactory } from './factory.js';
 
 /**
  * Tool definition interface
@@ -48,24 +48,29 @@ export class ToolRegistry {
    * Initialize all tools
    */
   private initializeTools(): void {
-    // Auto-generate tools using the tool generator
-    const generatedTools = ToolGenerator.generateAllTools();
+    // Define the core entity tools we know we'll support
+    const coreTools = [
+      EntityToolFactory.createProjectsTool(this.apiClient),
+      EntityToolFactory.createRepositoriesTool(this.apiClient),
+      EntityToolFactory.createWorkItemsTool(this.apiClient),
+      EntityToolFactory.createPullRequestsTool(this.apiClient),
+      EntityToolFactory.createPipelinesTool(this.apiClient),
+    ];
     
-    // Register all generated tools
-    for (const toolClass of generatedTools) {
-      this.registerTool(toolClass);
+    // Register all core entity tools
+    for (const tool of coreTools) {
+      this.registerTool(tool);
     }
     
-    console.debug(`Initialized ${generatedTools.length} tools`);
+    console.debug(`Initialized ${coreTools.length} entity tools`);
   }
 
   /**
    * Register a tool
-   * @param toolClass Tool class
+   * @param tool Tool instance
    */
-  registerTool(toolClass: ToolConstructor): void {
-    const definition = toolClass.getDefinition();
-    const tool = new toolClass(this.apiClient);
+  registerTool(tool: Tool & { getDefinition(): ToolDefinition }): void {
+    const definition = tool.getDefinition();
     
     this.tools.set(definition.name, tool);
     this.toolDefinitions.set(definition.name, definition);
@@ -116,7 +121,7 @@ export class ToolRegistry {
       
       throw new McpError(
         ErrorCode.InternalError,
-        `Tool execution failed: ${error instanceof Error ? error.message : String(error)}`
+        `Failed to execute ${name}: ${error instanceof Error ? error.message : String(error)}`
       );
     }
   }

@@ -1,73 +1,78 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { McpError } from '@modelcontextprotocol/sdk/types.js';
-
-import { ConfigManager } from './config/index.js';
-import { ADOService } from './api/index.js';
-import { ToolRegistry } from './tools/index.js';
-import { RequestHandlers } from './handlers/index.js';
+import { ADOApiClient } from './api/client/index.js';
+import { ConfigManager } from './config/config.js';
+import { registerRequestHandlers } from './handlers/request.handlers.js';
 import { getServerCapabilities } from './server.capabilities.js';
 
 /**
- * Azure DevOps MCP server
- * Main server class that initializes and manages the MCP server
+ * Start the MCP server
  */
-export class AzureDevOpsServer {
-  private server: Server;
-  private service: ADOService;
-  private toolRegistry: ToolRegistry;
-  private requestHandlers: RequestHandlers;
-
-  /**
-   * Create a new Azure DevOps MCP server
-   */
-  constructor() {
+export async function startServer(): Promise<void> {
+  try {
     // Load configuration
     const config = ConfigManager.loadConfig();
     ConfigManager.validateConfig(config);
+    console.debug('Loaded configuration:', {
+      organization: config.organization,
+      project: config.project,
+      baseUrl: config.api?.baseUrl,
+    });
     
-    // Initialize service
-    this.service = new ADOService(config);
+    // Create API client
+    const apiConfig = {
+      organization: config.organization,
+      project: config.project,
+      credentials: {
+        pat: config.credentials.pat
+      },
+      baseUrl: config.api?.baseUrl,
+      version: config.api?.version,
+      retry: config.api?.retry
+    };
+    const apiClient = new ADOApiClient(apiConfig);
+    console.debug('Created API client');
     
-    // Initialize tool registry
-    this.toolRegistry = new ToolRegistry(this.service.getApiClient());
-    
-    // Initialize server
-    this.server = new Server(
+    // Create server
+    const server = new Server(
       {
-        name: 'azure-devops-server',
+        name: 'azure-devops-mcp',
         version: '0.1.0',
       },
-      getServerCapabilities(this.service.getApiClient())
+      getServerCapabilities(apiClient)
     );
+    console.debug('Created server');
     
-    // Initialize request handlers
-    this.requestHandlers = new RequestHandlers(this.server, this.toolRegistry);
+    // Register request handlers
+    registerRequestHandlers(server, apiClient);
+    console.debug('Registered request handlers');
     
-    // Set up error handling
-    this.setupErrorHandling();
-  }
-
-  /**
-   * Set up error handling
-   */
-  private setupErrorHandling(): void {
-    this.server.onerror = (error) => console.error('[MCP Error]', error);
+    // Set up error handler
+    server.onerror = (error) => {
+      console.error('Server error:', error);
+    };
     
+    // Connect to transport
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.debug('Server connected to transport');
+    
+    // Handle process signals
     process.on('SIGINT', async () => {
-      await this.server.close();
+      console.debug('Received SIGINT, shutting down');
+      await server.close();
       process.exit(0);
     });
-  }
-
-  /**
-   * Run the server
-   */
-  async run(): Promise<void> {
-    const transport = new StdioServerTransport();
-    await this.server.connect(transport);
     
-    const timestamp = new Date().toISOString();
-    console.error(`Azure DevOps MCP server running on stdio (started at ${timestamp})`);
+    process.on('SIGTERM', async () => {
+      console.debug('Received SIGTERM, shutting down');
+      await server.close();
+      process.exit(0);
+    });
+    
+    console.debug('Server started');
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
   }
 }

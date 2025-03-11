@@ -1,5 +1,8 @@
 #!/usr/bin/env node
-import { AzureDevOpsServer } from './server.js';
+import { startServer } from './server.js';
 
-const server = new AzureDevOpsServer();
-server.run().catch(console.error);
+// Start the server
+startServer().catch((error) => {
+  console.error('Failed to start server:', error);
+  process.exit(1);
+});

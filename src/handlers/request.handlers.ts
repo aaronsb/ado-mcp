@@ -1,86 +1,45 @@
+import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
 import {
   CallToolRequestSchema,
-  ErrorCode,
   ListToolsRequestSchema,
-  McpError,
 } from '@modelcontextprotocol/sdk/types.js';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { ToolRegistry } from '../tools/index.js';
+import { ADOApiClient } from '../api/client/index.js';
+import { ToolRegistry } from '../tools/registry.js';
 
 /**
- * Request handlers for Azure DevOps MCP server
- * Manages MCP protocol request handling and routing
+ * Register request handlers for the server
+ * @param server MCP server
+ * @param apiClient API client
  */
-export class RequestHandlers {
-  private server: Server;
-  private toolRegistry: ToolRegistry;
-
-  /**
-   * Create a new request handlers instance
-   * @param server MCP server instance
-   * @param toolRegistry Tool registry
-   */
-  constructor(server: Server, toolRegistry: ToolRegistry) {
-    this.server = server;
-    this.toolRegistry = toolRegistry;
-    this.setupHandlers();
-  }
-
-  /**
-   * Set up request handlers
-   */
-  private setupHandlers(): void {
-    this.setupListToolsHandler();
-    this.setupCallToolHandler();
-  }
-
-  /**
-   * Set up handler for ListTools requests
-   */
-  private setupListToolsHandler(): void {
-    this.server.setRequestHandler(ListToolsRequestSchema, async () => {
-      return {
-        tools: this.toolRegistry.getAllToolDefinitions(),
-      };
-    });
-  }
-
-  /**
-   * Set up handler for CallTool requests
-   */
-  private setupCallToolHandler(): void {
-    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
-      try {
-        const toolName = request.params.name;
-        const tool = this.toolRegistry.getTool(toolName);
-        
-        if (!tool) {
-          return {
-            content: [
-              {
-                type: 'text',
-                text: `Azure DevOps API tool '${toolName}' is not yet implemented.`,
-              },
-            ],
-          };
-        }
-        
-        return await tool.execute(request.params.arguments);
-      } catch (error) {
-        if (error instanceof McpError) {
-          throw error;
-        }
-
-        return {
-          content: [
-            {
-              type: 'text',
-              text: `Azure DevOps API error: ${error instanceof Error ? error.message : String(error)}`,
-            },
-          ],
-          isError: true,
-        };
+export function registerRequestHandlers(server: Server, apiClient: ADOApiClient): void {
+  // Create tool registry
+  const toolRegistry = new ToolRegistry(apiClient);
+  
+  // List tools handler
+  server.setRequestHandler(ListToolsRequestSchema, async () => {
+    const toolDefinitions = toolRegistry.getAllToolDefinitions();
+    
+    return {
+      tools: toolDefinitions,
+    };
+  });
+  
+  // Call tool handler
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    const { name, arguments: args } = request.params;
+    
+    try {
+      return await toolRegistry.executeTool(name, args);
+    } catch (error) {
+      if (error instanceof McpError) {
+        throw error;
       }
-    });
-  }
+      
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to execute tool ${name}: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  });
 }

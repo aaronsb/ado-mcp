@@ -1,87 +1,145 @@
 # Azure DevOps MCP Server
 
-A Model Context Protocol server for Azure DevOps integration, enabling AI assistants to interact with Azure DevOps resources.
-
-## Features
-
-- Interact with Azure DevOps Projects, Work Items, Repositories, Pull Requests, Branches, and Pipelines
-- Perform CRUD operations on Azure DevOps resources
-- Search and filter resources with flexible criteria
-- Seamless integration with AI assistants that support the Model Context Protocol
+This MCP (Model Context Protocol) server provides tools for interacting with Azure DevOps services through AI assistants.
 
 ## Architecture
 
-This project follows a modular architecture with clear separation of concerns:
+The server follows an entity-based architecture that groups operations by resource type rather than exposing many atomic tools. This approach provides several benefits:
 
+1. **Intuitive organization**: Tools are organized by the entities they operate on (projects, repositories, work items, etc.)
+2. **Reduced tool count**: Instead of dozens of individual tools, we have a handful of entity tools with multiple operations
+3. **Consistent interface**: All entity tools follow the same pattern for operations and parameters
+4. **Better error handling**: Each entity tool can handle errors specific to its domain
+5. **Easier discovery**: Users can easily discover available operations for each entity
+
+### Key Components
+
+- **Entity Tools**: Each tool represents a major Azure DevOps entity (projects, repositories, work items, etc.) and provides multiple operations (list, get, create, etc.)
+- **Tool Registry**: Manages the registration and execution of entity tools
+- **API Client**: Handles communication with the Azure DevOps REST API
+- **Configuration Manager**: Loads and validates configuration from environment variables or config file
+
+## Available Entity Tools
+
+### Projects Tool
+
+Manages Azure DevOps projects.
+
+Operations:
+- `list`: List all projects
+- `get`: Get details of a specific project
+
+### Repositories Tool
+
+Manages Git repositories.
+
+Operations:
+- `list`: List repositories in a project
+- `get`: Get details of a specific repository
+- `listBranches`: List branches in a repository
+
+### Work Items Tool
+
+Manages work items (bugs, tasks, user stories, etc.).
+
+Operations:
+- `get`: Get details of a work item
+- `create`: Create a new work item
+
+### Pull Requests Tool
+
+Manages pull requests.
+
+Operations:
+- `list`: List pull requests in a repository
+- `get`: Get details of a specific pull request
+
+### Pipelines Tool
+
+Manages CI/CD pipelines.
+
+Operations:
+- `list`: List pipelines in a project
+- `get`: Get details of a specific pipeline
+
+## Usage Examples
+
+### List Projects
+
+```json
+{
+  "operation": "list",
+  "listParams": {}
+}
 ```
-src/
-├── entities/       # Entity models for Azure DevOps resources
-├── api/            # API client and operations
-└── tools/          # MCP tool implementations
+
+### Get Project Details
+
+```json
+{
+  "operation": "get",
+  "getParams": {
+    "projectId": "my-project"
+  }
+}
 ```
 
-## Getting Started
+### List Repositories in a Project
 
-### Prerequisites
-
-- Node.js 20 or later
-- npm
-- Docker (for containerized deployment)
-- Azure DevOps Personal Access Token (PAT)
-
-### Installation
-
-#### Using Docker
-
-```bash
-# Clone the repository and build the Docker image locally
-git clone https://github.com/aaronsb/ado-mcp.git
-cd ado-mcp
-./scripts/build-local.sh
+```json
+{
+  "operation": "list",
+  "listParams": {
+    "projectId": "my-project"
+  }
+}
 ```
 
-#### Local Development
+### Get Work Item Details
 
-1. Clone the repository:
-```bash
-git clone https://github.com/aaronsb/ado-mcp.git
-cd ado-mcp
+```json
+{
+  "operation": "get",
+  "getParams": {
+    "id": 123,
+    "expand": "All"
+  }
+}
 ```
 
-2. Install dependencies:
-```bash
-npm install
-```
+### Create a Work Item
 
-3. Configure your Azure DevOps credentials:
-```bash
-cp config/azuredevops.example.json config/azuredevops.json
-# Edit config/azuredevops.json with your credentials
-```
-
-4. Build the project:
-```bash
-npm run build
-```
-
-5. Run the server:
-```bash
-node build/index.js
+```json
+{
+  "operation": "create",
+  "createParams": {
+    "projectId": "my-project",
+    "type": "Task",
+    "title": "Implement new feature",
+    "description": "This task involves implementing the new feature XYZ",
+    "assignedTo": "user@example.com"
+  }
+}
 ```
 
 ## Configuration
 
-The server can be configured using environment variables or a configuration file:
+The server can be configured using environment variables or a configuration file.
 
 ### Environment Variables
 
-- `ADO_ORGANIZATION`: Your Azure DevOps organization name
-- `ADO_PROJECT`: Your Azure DevOps project name (optional)
-- `ADO_PAT`: Your Personal Access Token
+- `ADO_ORGANIZATION`: Azure DevOps organization name (required)
+- `ADO_PROJECT`: Default project name (optional)
+- `ADO_PAT`: Personal Access Token for authentication (required)
+- `ADO_API_URL`: Base URL for the API (optional, defaults to https://dev.azure.com)
+- `ADO_API_VERSION`: API version (optional, defaults to 7.0)
+- `ADO_API_MAX_RETRIES`: Maximum number of retries for API calls (optional, defaults to 3)
+- `ADO_API_DELAY_MS`: Delay between retries in milliseconds (optional, defaults to 1000)
+- `ADO_API_BACKOFF_FACTOR`: Backoff factor for retries (optional, defaults to 2)
 
 ### Configuration File
 
-Create a `config/azuredevops.json` file with the following structure:
+Alternatively, you can create a `config/azuredevops.json` file with the following structure:
 
 ```json
 {
@@ -89,39 +147,36 @@ Create a `config/azuredevops.json` file with the following structure:
   "project": "your-project",
   "credentials": {
     "pat": "your-personal-access-token"
+  },
+  "api": {
+    "baseUrl": "https://dev.azure.com",
+    "version": "7.0",
+    "retry": {
+      "maxRetries": 3,
+      "delayMs": 1000,
+      "backoffFactor": 2
+    }
   }
 }
 ```
 
-## API Reference
+## Development
 
-This project integrates with the [Azure DevOps REST API](https://learn.microsoft.com/en-us/rest/api/azure/devops/).
+### Building the Server
 
-## Tools
+```bash
+npm run build
+```
 
-The server provides the following MCP tools:
+### Running the Server
 
-- `list_projects`: List Azure DevOps projects
-- `get_project`: Get details of a specific project
-- `list_work_items`: List work items with filtering
-- `get_work_item`: Get details of a specific work item
-- `create_work_item`: Create a new work item
-- `update_work_item`: Update an existing work item
-- `list_repositories`: List Git repositories
-- `get_repository`: Get details of a specific repository
-- `list_pull_requests`: List pull requests
-- `get_pull_request`: Get details of a specific pull request
-- `create_pull_request`: Create a new pull request
-- `list_branches`: List branches in a repository
-- `create_branch`: Create a new branch
-- `list_pipelines`: List pipelines
-- `get_pipeline`: Get details of a specific pipeline
-- `run_pipeline`: Trigger a pipeline run
+```bash
+node build/index.js
+```
 
-## Contributing
+### Docker
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+```bash
+docker build -t azure-devops-mcp:local .
+docker run -i --rm -e ADO_ORGANIZATION=your-org -e ADO_PAT=your-pat azure-devops-mcp:local
+```
