@@ -1,6 +1,6 @@
-import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
 import * as azdev from 'azure-devops-node-api';
 import { ADOApiConfig, DEFAULT_API_CONFIG } from './api.types.js';
+import { handleApiError } from '../utils/index.js';
 
 /**
  * Azure DevOps API client using the official azure-devops-node-api library
@@ -144,36 +144,8 @@ export class ADOApiClient {
    * @param context Error context
    * @returns McpError
    */
-  private handleError(error: any, context: string): McpError {
-    console.error(`${context}:`, error);
-    
-    // Check if it's an API error with status code
-    if (error.statusCode) {
-      const status = error.statusCode;
-      const message = error.message || 'Unknown error';
-      
-      if (status === 401 || status === 403) {
-        return new McpError(
-          ErrorCode.InvalidRequest,
-          `Authentication failed: ${message}`
-        );
-      } else if (status === 404) {
-        return new McpError(
-          ErrorCode.InvalidRequest,
-          `Resource not found: ${message}`
-        );
-      } else if (status === 400) {
-        return new McpError(
-          ErrorCode.InvalidParams,
-          `Bad request: ${message}`
-        );
-      }
-    }
-    
-    return new McpError(
-      ErrorCode.InternalError,
-      `${context}: ${error instanceof Error ? error.message : String(error)}`
-    );
+  private handleError(error: any, context: string): ReturnType<typeof handleApiError> {
+    return handleApiError(error, 'ADOApiClient', context);
   }
 
   /**
