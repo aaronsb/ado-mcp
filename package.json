@@ -2,6 +2,8 @@
   "name": "ado-mcp",
   "version": "0.1.0",
   "description": "A Model Context Protocol server for Azure DevOps",
+  "author": "Aaron Bockelie <aaronsb@gmail.com>",
+  "license": "MIT",
   "private": true,
   "type": "module",
   "bin": {

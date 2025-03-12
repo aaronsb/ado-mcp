@@ -367,3 +367,7 @@ node build/index.js
 ```bash
 docker build -t azure-devops-mcp:local .
 docker run -i --rm -e ADO_ORGANIZATION=your-org -e ADO_PAT=your-pat azure-devops-mcp:local
+
+## License
+
+MIT License © 2025 Aaron Bockelie <aaronsb@gmail.com>

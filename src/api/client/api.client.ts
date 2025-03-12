@@ -1,3 +1,9 @@
+/**
+ * Azure DevOps MCP Server - API Client
+ * 
+ * @copyright Copyright (c) 2025 Aaron Bockelie <aaronsb@gmail.com>
+ * @license MIT
+ */
 import * as azdev from 'azure-devops-node-api';
 import { ADOApiConfig, DEFAULT_API_CONFIG } from './api.types.js';
 import { handleApiError } from '../utils/index.js';

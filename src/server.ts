@@ -1,3 +1,9 @@
+/**
+ * Azure DevOps MCP Server - Server Implementation
+ * 
+ * @copyright Copyright (c) 2025 Aaron Bockelie <aaronsb@gmail.com>
+ * @license MIT
+ */
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { ADOApiClient } from './api/client/index.js';

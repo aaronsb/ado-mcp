@@ -1,4 +1,10 @@
 #!/usr/bin/env node
+/**
+ * Azure DevOps MCP Server
+ * 
+ * @copyright Copyright (c) 2025 Aaron Bockelie <aaronsb@gmail.com>
+ * @license MIT
+ */
 import { startServer } from './server.js';
 
 // Start the server

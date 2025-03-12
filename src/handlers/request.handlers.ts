@@ -1,3 +1,9 @@
+/**
+ * Azure DevOps MCP Server - Request Handlers
+ * 
+ * @copyright Copyright (c) 2025 Aaron Bockelie <aaronsb@gmail.com>
+ * @license MIT
+ */
 import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
 import {
   CallToolRequestSchema,

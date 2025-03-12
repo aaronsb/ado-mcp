@@ -1,3 +1,9 @@
+/**
+ * Azure DevOps MCP Server - Server Capabilities
+ * 
+ * @copyright Copyright (c) 2025 Aaron Bockelie <aaronsb@gmail.com>
+ * @license MIT
+ */
 import { ToolRegistry } from './tools/registry.js';
 import { ADOApiClient } from './api/client/index.js';
 
