@@ -1,5 +1,9 @@
 # Azure DevOps MCP Server
 
+<p align="center">
+  <img src="docs/ado-mcp-400x400.png" alt="ADO MCP Logo" width="400" height="400">
+</p>
+
 This MCP (Model Context Protocol) server provides tools for interacting with Azure DevOps services through AI assistants.
 
 ## Architecture
